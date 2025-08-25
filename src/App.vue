@@ -2,7 +2,7 @@
     <div id="app">
         <section class="hdl-menu">
             <a-menu
-                :default-selected-keys="current"
+                v-model="current"
                 :open-keys.sync="openKeys"
                 mode="inline">
                 <a-sub-menu
@@ -14,7 +14,7 @@
                     </span>
                     <a-menu-item
                         v-for="subItem in item.children"
-                        @click="menuClick(subItem)"
+                        @click="menuClick(subItem, item)"
                         :key="subItem.key">
                         {{ subItem.name }}
                     </a-menu-item>
@@ -30,9 +30,21 @@
 export default {
     data() {
         return {
-            current: ["maplibre-gl"],
-            openKeys: ["map"],
+            current: ["home"],
+            openKeys: ["home"],
             menuConfig: [
+                {
+                    name: "首页",
+                    icon: "global",
+                    key: "home",
+                    children: [
+                        {
+                            name: "首页",
+                            key: "home",
+                            url: "/home",
+                        },
+                    ],
+                },
                 {
                     name: "maplibre用例",
                     icon: "global",
@@ -53,12 +65,34 @@ export default {
             ],
         };
     },
-    watch: {},
+    watch: {
+        $route(to, from) {
+            if (from.path === "/") {
+                const currentUrl = to.path;
+                this.matchMenu(currentUrl);
+            }
+        },
+    },
+    mounted() {
+        const currentUrl = this.$route.path;
+        if (currentUrl !== "/") {
+            this.matchMenu(currentUrl);
+        }
+    },
     methods: {
-        menuClick(item) {
-            console.log("click", item);
-            if (this.$route.path === item.url) return;
-            this.$router.push({ path: item.url });
+        menuClick(subItem) {
+            if (this.$route.path === subItem.url) return;
+            this.$router.push({ path: subItem.url });
+        },
+        matchMenu(url) {
+            this.menuConfig.forEach(item => {
+                item.children.forEach(subItem => {
+                    if (subItem.url === url) {
+                        this.current = [subItem.key];
+                        this.openKeys = [item.key];
+                    }
+                });
+            });
         },
     },
 };

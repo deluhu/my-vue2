@@ -9,7 +9,11 @@ import maplibre from "./modules/maplibre.js";
 const router = [
     {
         path: "/",
-        redirect: "/maplibre-gl",
+        redirect: "/home",
+    },
+    {
+        path: "/home",
+        component: resolve => require(["@views/home/index.vue"], resolve),
     },
     ...maplibre,
 ];

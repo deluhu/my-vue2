@@ -1,16 +1,27 @@
 <template>
-    <main> 111 </main>
+    <maplibreGl @ready="mapReady"> </maplibreGl>
+     <!-- <span>222</span> -->
 </template>
 
 <script>
+import maplibreGl from "@cmp/maplibre-gl";
 export default {
     name: "hydrodynamic-model",
+    components: {
+        maplibreGl,
+    },
     data() {
-        return {};
+        return {
+            map: null,
+        };
     },
     watch: {},
     mounted() {},
-    methods: {},
+    methods: {
+        mapReady(map) {
+            this.map = map;
+        },
+    },
 };
 </script>
 
