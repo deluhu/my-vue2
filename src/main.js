@@ -1,8 +1,20 @@
-import Vue from 'vue'
-import App from './App.vue'
+import Vue from "vue";
+import App from "@/App.vue";
 
-Vue.config.productionTip = false
+import axios from "axios";
+Vue.prototype.$axios = axios;
+
+import Antd from "ant-design-vue";
+import "ant-design-vue/dist/antd.css";
+
+Vue.use(Antd);
+Vue.prototype.$message = Antd.message;
+
+Vue.config.productionTip = false;
+
+import router from "@/router/index.js";
 
 new Vue({
-  render: h => h(App),
-}).$mount('#app')
+    router,
+    render: h => h(App),
+}).$mount("#app");
