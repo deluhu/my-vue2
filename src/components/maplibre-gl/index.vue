@@ -1,9 +1,9 @@
 <template>
-    <main>
+    <div class="maplibre-gl">
         <div
-            id="map"
-            style="width: 100%; height: 100vh"></div>
-        <div style="position: absolute; top: 10px; left: 10px; z-index: 1">
+            class="map-container"
+            id="map-el"></div>
+        <div class="layer-select">
             <select
                 v-model="currentStyle"
                 @change="changeMapStyle">
@@ -13,7 +13,7 @@
             </select>
         </div>
         <div class="fps">FPS：{{ fps }}</div>
-    </main>
+    </div>
 </template>
 
 <script>
@@ -27,17 +27,12 @@ export default {
         return {
             map: null,
             baseConfig: {
-                // center: [114.305, 30.5928], // 武汉市中心
-                center: [114.38289848809904, 30.603658880826956], // 仁和路
+                center: [114.305, 30.5928], // 武汉市中心
                 zoom: 6,
-                // bounds: [
-                //   [113.8, 30.2],
-                //   [114.6, 30.9],
-                // ], // 武汉市大致范围
                 bounds: [
-                    [114.3760442254665, 30.60883451645401],
-                    [114.38897621261208, 30.597845743044175],
-                ], // 仁和路大致范围
+                    [113.8, 30.2],
+                    [114.6, 30.9],
+                ], // 武汉市大致范围
             },
             baseUrl: {
                 vec: "./gis-ae/tdt-map/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=6cd9a2cd6399e2f545b4afacc6177fda",
@@ -56,7 +51,7 @@ export default {
     methods: {
         initMap() {
             this.map = new maplibregl.Map({
-                container: "map",
+                container: "map-el",
                 style: this.getStyle(),
                 center: this.baseConfig.center, // 武汉市中心
                 zoom: this.baseConfig.zoom,
@@ -69,6 +64,15 @@ export default {
                 this.addControls();
                 this.addDrawControls();
                 this.$emit("ready", this.map);
+                Window.maplibreGL = this.map;
+            });
+        },
+        fitMapToBounds(bounds) {
+            const padding = new maplibregl.EdgeInsets(50, 50, 50, 50); // 上、右、下、左
+            const mapBounds = bounds || this.baseConfig.bounds;
+            this.map.fitBounds(mapBounds, {
+                padding: padding,
+                animate: false,
             });
         },
         getFps() {
@@ -127,13 +131,6 @@ export default {
                     },
                 ],
             };
-        },
-        fitMapToBounds() {
-            const padding = new maplibregl.EdgeInsets(50, 50, 50, 50); // 上、右、下、左
-            this.map.fitBounds(this.baseConfig.bounds, {
-                padding: padding,
-                animate: false,
-            });
         },
         addControls() {
             this.map.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -244,21 +241,14 @@ export default {
                 if (title === "Delete") button.setAttribute("title", "删除");
             });
             this.map.on("draw.create", e => {
-                const drawType = e.features[0].geometry.type;
+                console.log("🚀 ~ addDrawControls ~ e:", e);
+                // const drawType = e.features[0].geometry.type;
                 const featureId = e.features[0].id;
                 draw.setFeatureProperty(featureId, "editable", false); // 标记为不可编辑
                 // draw.changeMode('static');  // 切换到静态模式
-                if (drawType === "Polygon") {
-                    this.renderRandomMarker(e.features[0]);
-                }
             });
             this.map.on("draw.delete", e => {
-                const drawType = e.features[0].geometry.type;
-                if (drawType === "Polygon") {
-                    const uid = e.features[0].id.slice(0, 4);
-                    this.map.removeLayer(`random-points-${uid}`);
-                    this.map.removeSource(`random-points-${uid}`);
-                }
+                console.log("🚀 ~ addDrawControls ~ e:", e);
             });
         },
     },
@@ -266,37 +256,54 @@ export default {
 </script>
 
 <style lang="scss">
-.fps {
-    position: absolute;
-    right: 12px;
-    bottom: 40px;
-    background-color: rgb(255, 255, 255);
-    padding: 4px 6px;
-    border-radius: 24px;
-    font-size: 12px;
-}
+.maplibre-gl {
+    width: 100%;
+    height: 100%;
 
-.mapboxgl-ctrl-group {
-    float: right;
-    margin: 10px 10px 0 0;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
-    clear: both;
-    pointer-events: auto;
-    transform: translate(0);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    .map-container {
+        width: 100%;
+        height: 100%;
+    }
 
-    .mapbox-gl-draw_ctrl-draw-btn {
-        border: none;
-        cursor: pointer;
-        border-bottom: 1px solid #ddd;
-        background-color: #fff;
-        background-size: 24px;
+    .layer-select {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+    }
 
-        &:last-child {
-            border-bottom: none;
+    .fps {
+        position: absolute;
+        right: 12px;
+        bottom: 40px;
+        background-color: rgb(255, 255, 255);
+        padding: 4px 6px;
+        border-radius: 24px;
+        font-size: 12px;
+    }
+
+    .mapboxgl-ctrl-group {
+        float: right;
+        margin: 10px 10px 0 0;
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        clear: both;
+        pointer-events: auto;
+        transform: translate(0);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .mapbox-gl-draw_ctrl-draw-btn {
+            border: none;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            background-color: #fff;
+            background-size: 24px;
+
+            &:last-child {
+                border-bottom: none;
+            }
         }
     }
 }
