@@ -15,6 +15,7 @@ module.exports = defineConfig({
                 "@views": path.resolve(__dirname, "src/views"),
                 "@config": path.resolve(__dirname, "src/config"),
                 "@cmp": path.resolve(__dirname, "src/components"),
+                "@style": path.resolve(__dirname, "src/style"),
             },
         },
     },

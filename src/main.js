@@ -10,6 +10,8 @@ import "ant-design-vue/dist/antd.css";
 Vue.use(Antd);
 Vue.prototype.$message = Antd.message;
 
+import "@style/global.scss";
+
 Vue.config.productionTip = false;
 
 import router from "@/router/index.js";
