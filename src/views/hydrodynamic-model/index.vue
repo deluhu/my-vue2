@@ -8,7 +8,7 @@
             <TimePlayer
                 :startTime="startTime"
                 :endTime="endTime"
-                :interval-seconds="60"
+                :interval-seconds="stepSec"
                 @time-change="onTimeChange" />
         </div>
     </div>
@@ -18,7 +18,7 @@
 import dayjs from "dayjs";
 import TimePlayer from "@cmp/time-slider";
 import maplibreGl from "@cmp/maplibre-gl";
-import { pipeData, DMABounds } from "./mock.js";
+import { startTs, endTs, stepSec, pipeData, pressureData, DMABounds } from "./mock.js";
 export default {
     name: "hydrodynamic-model",
     components: {
@@ -28,17 +28,17 @@ export default {
     data() {
         return {
             map: null,
-            geojsonData: null,
 
-            startTime: 0,
-            endTime: 0,
+            startTime: startTs,
+            endTime: endTs,
+            stepSec,
+
+            timer: null,
         };
     },
     watch: {},
     mounted() {
-        const timeRange = Object.keys(pipeData[0].pressure).map(Number);
-        this.startTime = timeRange[0];
-        this.endTime = timeRange[timeRange.length - 1];
+        // console.log(pipeData, pressureData);
     },
     methods: {
         mapReady(map) {
@@ -50,21 +50,23 @@ export default {
             this.updatePipeColors(this.startTime);
         },
         onTimeChange(timeStr) {
-            const timestamp = dayjs(timeStr).unix();
-            this.updatePipeColors(timestamp);
+            if (this.timer) clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                const timestamp = dayjs(timeStr).unix();
+                this.updatePipeColors(timestamp);
+                this.timer = null;
+            }, 100);
         },
         getGeojsonData() {
-            this.geojsonData = {
+            return {
                 type: "FeatureCollection",
                 features: pipeData.map(i => {
                     return {
                         type: "Feature",
+                        id: i.id,
                         geometry: {
                             type: "LineString",
                             coordinates: i.coordinates,
-                        },
-                        properties: {
-                            id: i.id,
                         },
                     };
                 }),
@@ -73,7 +75,7 @@ export default {
         addLineSource() {
             this.map.addSource("pipe-source", {
                 type: "geojson",
-                data: this.geojsonData,
+                data: this.getGeojsonData(),
             });
         },
         addLineLayer() {
@@ -82,31 +84,16 @@ export default {
                 type: "line",
                 source: "pipe-source",
                 paint: {
-                    "line-color": ["get", "$$colors"],
-                    "line-width": 4,
+                    "line-width": 3,
+                    "line-color": ["step", ["to-number", ["feature-state", "pressure"], 0], "#4791FF", 3, "#FDA154", 6, "#FC6B6B"],
                 },
             });
         },
-        getColorByPressure(value) {
-            if (value < 0.3) return "#4791FF"; // 蓝
-            if (value < 0.6) return "#FDA154"; // 橙
-            return "#FC6B6B"; // 红
-        },
         updatePipeColors(timestamp) {
-            const newData = {
-                type: "FeatureCollection",
-                features: this.geojsonData.features.map((f, i) => {
-                    const value = pipeData[i].pressure[timestamp];
-                    return {
-                        ...f,
-                        properties: {
-                            ...f.properties,
-                            $$colors: this.getColorByPressure(value),
-                        },
-                    };
-                }),
-            };
-            this.map.getSource("pipe-source").setData(newData);
+            const index = Math.floor((timestamp - startTs) / 60);
+            for (const id in pressureData) {
+                this.map.setFeatureState({ source: "pipe-source", id }, { pressure: pressureData[id][index].toFixed(2) });
+            }
         },
     },
 };
