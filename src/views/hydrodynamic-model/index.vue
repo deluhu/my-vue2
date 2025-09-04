@@ -16,9 +16,26 @@
 
 <script>
 import dayjs from "dayjs";
+
+import { startTs, endTs, stepSec, pipeData, pressureData, DMABounds } from "./mock.js";
+
 import TimePlayer from "@cmp/time-slider";
 import maplibreGl from "@cmp/maplibre-gl";
-import { startTs, endTs, stepSec, pipeData, pressureData, DMABounds } from "./mock.js";
+
+const GeoJson = {
+    type: "FeatureCollection",
+    features: pipeData.map(i => {
+        return {
+            type: "Feature",
+            id: i.id,
+            geometry: {
+                type: "LineString",
+                coordinates: i.coordinates,
+            },
+        };
+    }),
+};
+
 export default {
     name: "hydrodynamic-model",
     components: {
@@ -44,7 +61,6 @@ export default {
         mapReady(map) {
             this.map = map;
             this.$refs.mapRef.fitMapToBounds(DMABounds);
-            this.getGeojsonData();
             this.addLineSource();
             this.addLineLayer();
             this.updatePipeColors(this.startTime);
@@ -57,25 +73,10 @@ export default {
                 this.timer = null;
             }, 100);
         },
-        getGeojsonData() {
-            return {
-                type: "FeatureCollection",
-                features: pipeData.map(i => {
-                    return {
-                        type: "Feature",
-                        id: i.id,
-                        geometry: {
-                            type: "LineString",
-                            coordinates: i.coordinates,
-                        },
-                    };
-                }),
-            };
-        },
         addLineSource() {
             this.map.addSource("pipe-source", {
                 type: "geojson",
-                data: this.getGeojsonData(),
+                data: GeoJson,
             });
         },
         addLineLayer() {
