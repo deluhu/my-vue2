@@ -6,7 +6,7 @@
         <template v-for="item in menuConfig">
             <a-sub-menu
                 v-if="item.children"
-                :key="item.key">
+                :key="item.key + '-submenu'">
                 <span slot="title">
                     <a-icon :type="item.icon" />
                     <span>{{ item.name }}</span>
@@ -29,7 +29,7 @@
     </a-menu>
 </template>
 <script>
-import menuConfig from "./config.js";
+import menuConfig from "@/router/config.js";
 export default {
     name: "hdl-menu",
     props: {

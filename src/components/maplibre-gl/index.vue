@@ -38,8 +38,9 @@ export default {
                 vec: "./gis-ae/tdt-map/vec_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=vec&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=6cd9a2cd6399e2f545b4afacc6177fda",
                 img: "./gis-ae/tdt-map/img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=6cd9a2cd6399e2f545b4afacc6177fda",
                 ter: "./gis-ae/tdt-map/ter_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ter&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=6cd9a2cd6399e2f545b4afacc6177fda",
-                cva: "./gis-ae/tdt-map/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=6cd9a2cd6399e2f545b4afacc6177fda",
             },
+            baseCva:
+                "./gis-ae/tdt-map/cva_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cva&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&TILECOL={x}&TILEROW={y}&TILEMATRIX={z}&tk=6cd9a2cd6399e2f545b4afacc6177fda",
             currentStyle: "vec",
             fps: 0,
         };
@@ -114,7 +115,7 @@ export default {
                     },
                     label: {
                         type: "raster",
-                        tiles: [this.baseUrl.cva],
+                        tiles: [this.baseCva],
                         tileSize: 256,
                     },
                 },

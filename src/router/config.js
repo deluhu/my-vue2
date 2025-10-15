@@ -20,6 +20,11 @@ const config = [
                 key: "hydrodynamic-model",
                 url: "/hydrodynamic-model",
             },
+            {
+                name: "底图测试",
+                key: "baseMap-test",
+                url: "/baseMap-test",
+            },
         ],
     },
 ];
