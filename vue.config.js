@@ -21,8 +21,23 @@ module.exports = defineConfig({
     },
     devServer: {
         proxy: {
-            "/gis-ae": {
+            "/gis-ae/": {
                 target: "https://140.246.183.164:8000",
+                changeOrigin: true,
+                secure: false,
+            },
+            "/gis/": {
+                target: "https://140.246.183.164:8000",
+                changeOrigin: true,
+                secure: false,
+            },
+            "/restapi/": {
+                target: "http://10.231.1.33",
+                changeOrigin: true,
+                secure: false,
+            },
+            "/apisix/": {
+                target: "http://10.231.1.33",
                 changeOrigin: true,
                 secure: false,
             },

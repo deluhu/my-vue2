@@ -503,7 +503,7 @@ export default {
       });
     },
     async addSymbolLayer() {
-      const image = await this.map.loadImage("/cs3.png");
+      const image = await this.map.loadImage("/img.png");
       this.map.addImage("cat", image.data);
       this.map.addSource("symbol-img", {
         type: "geojson",
@@ -533,7 +533,7 @@ export default {
       });
     },
     async addLineLayer() {
-      const image = await this.map.loadImage("/cs3.png");
+      const image = await this.map.loadImage("/img.png");
       this.map.addImage("cat", image.data);
       this.map.addSource("line-cs-point", {
         type: "geojson",
